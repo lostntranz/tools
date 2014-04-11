@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 
-#########
-# sprint.py - This tool uses threading
-# module from python for initiating many threads
-# in parallel to run commands on remote hosts
-# as listed in ${rolename}.txt
+####
+# sprint.py - Multi-threaded command trigger. 
+# Initiating many threads in parallel on remote
+# hosts. Roles are implementation of chef role 
+# or passing a list of hosts as input file.
 #
 # $Author: daman $
 # $Date: 2013/05/01
 # $Name: sprint.py
 # $State: Exp $
-####
 
+####
 import os
 import sys
 import glob
@@ -145,8 +145,8 @@ def main():
 Example:
     sprint.py -l                                                     # list cached groups
     sprint.py -r web-app -c 'uptime'
-    sprint.py -r web-lb mail ipvs-api  -c 'date'                     # supports multiple roles 
-    sprint.py -r *api* -c 'sudo sv status /etc/sv/soundcloud-api*'   # even supports '*' wildcard
+    sprint.py -r web-lb mail dns -c 'date'                     # supports multiple roles 
+    sprint.py -r mysql -c 'mysql -e "show slave status\G"'   # even supports '*' wildcard
     sprint.py -i /tmp/list_of_host -c 'free -m'                       # reads list of host from file
 """
   Description = """Host list files are only cached for 1 day."""
