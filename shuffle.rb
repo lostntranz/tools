@@ -61,7 +61,7 @@ def restart_thins(client_list)
     puts "Exec: Restarting thins on #{remote_host}"
     Net::SSH::Multi.start do |ssh|
       ssh.use remote_host, :user => ENV['USER']
-      ssh.exec 'for x in `ls /etc/sv |egrep "(^soundcloud-)|(notifications-)" |grep -v restart`; do echo "Restarting $x"; sudo su -l -c "sv -w 60 restart $x"; done'
+      ssh.exec 'for x in `ls /etc/sv |egrep "(^application-)|(notifications-)" |grep -v restart`; do echo "Restarting $x"; sudo su -l -c "sv -w 60 restart $x"; done'
     end
     }
   end
@@ -79,9 +79,6 @@ option = {}
 optparser = OptionParser.new do |opt|
   opt.banner = "
 Usage: shuffle.rb [ -c client(s) | -s source_db (fqdn)| -f path_to_file ] -t target db (fqdn)
-Example: ./shuffle.rb -c ip-10-33-41-28.m11.ams5.s-cloud.net,ip-10-33-19-38.n04.ams5.s-cloud.net -t ip-10-33-19-51.n04.ams5.s-cloud.net
-\t./shuffle.rb -n4 -s ip-10-33-41-42.m11.ams5.s-cloud.net -t ip-10-33-19-51.n04.ams5.s-cloud.net
-\t./shuffle.rb -s ip-10-33-41-42.m11.ams5.s-cloud.net -t lb-soundcloud ## evacuate all clients to slave pool.\n\n"
   opt.on("-c", "--client CLIENT", "Map a single client or multiple clients separated by comma. White space is allowed but will need to be quoted") do |c|
     option[:client] = c
   end
@@ -95,7 +92,7 @@ Example: ./shuffle.rb -c ip-10-33-41-28.m11.ams5.s-cloud.net,ip-10-33-19-38.n04.
   opt.on("-f", "--file FILENAME", "Use hosts listed in this file. Mainly for pinning a list of hosts to new DB server.  ") do |fh|
     option[:file] = fh
   end
-  opt.on("-t", "--target DB", "Move to this target db, or use 'lb-soundcloud' to move to slave pool") do |td|
+  opt.on("-t", "--target DB", "Move to this target db, or use pool") do |td|
     check_role(td)
     option[:target] = td
   end
@@ -144,7 +141,7 @@ client_list.each do |host|
     new_role = "role[#{option[:target]}]"
   end
   # 
-  if not option[:target].eql? 'lb-soundcloud'
+  if not option[:target].eql? 'loadbalancer'
     puts "Exec: Applying roles #{new_role} to #{host}"
     %x(knife node run_list add #{host} "#{new_role}")
   end
